@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { authService, firebaseInstance } from "../firebase";
 
+console.log("run auth");
 
+//const Auth = function() { } 와 동일하다
 const Auth = () => {
+  console.log("run auth fc");
     const [email, setEmail] =useState("");
     const [password, setPassword] = useState("");
     const [newAccount, setNewAccount] = useState(true);
@@ -70,4 +73,5 @@ const Auth = () => {
 </div>
     );
 };
+
 export default Auth;

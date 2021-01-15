@@ -1,31 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { dbService } from "../firebase";
 
-const Home = () => {
+console.log("run home");
+
+const Home = ({userObj}) => {
     const [checipe, setchecipe] = useState("");
     const [checipes, setchecipes] = useState([]);
-    const getchecipes = async() => {
     
-       const dbchecipes = await dbService.collection("checipe").get()
-       dbchecipes.forEach((document) => {
-           const checipeObject = {
-               ...document.data(),
-               id: document.id,
-           }
-           setchecipes((prev) => [checipeObject, ...prev]);
-       });
-        console.log(dbchecipes);
-    };
     useEffect(()=>{
-        getchecipes();
+      dbService.collection("checipe").onSnapshot((snapshot) => {
+        const checipeArray = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setchecipes(checipeArray);
+      });
     },[]);
     
     
     const onSubmit = async (event) => {
       event.preventDefault();
       await dbService.collection("checipe").add({
-          checipe,
+          text:checipe,
           createdAt:Date.now(),
+          creatorId: userObj.uid,
       });
       setchecipe("");
     };
@@ -35,7 +33,6 @@ const Home = () => {
       } = event;
       setchecipe(value);
     };
-    console.log(checipes);
     return (
       <div>
         <form onSubmit={onSubmit}>
@@ -49,8 +46,11 @@ const Home = () => {
           <input type="submit" value="checipe" />
         </form>
         <div key={checipe.id}>
-            {checipes.map(checipe => <div>
-                <h4>{checipe.checipe}</h4></div>)}
+            {checipes.map(checipe => 
+            <div>
+                <h4>{checipe.text}</h4>
+            </div>)
+            }
         </div>
       </div>
     );
